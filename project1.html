@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Colourful Age Calculator</title>
+
+<style>
+:root {
+    --gradient-bg: linear-gradient(135deg, #667eea, #764ba2);
+    --card-bg: #ffffff;
+    --accent: #ff6b6b;
+    --accent-hover: #ff4d4d;
+    --success-bg: #e6fffa;
+    --success-text: #065f46;
+    --error-bg: #ffe6e6;
+    --error-text: #b91c1c;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", sans-serif;
+}
+
+body {
+    height: 100vh;
+    background: var(--gradient-bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    background: var(--card-bg);
+    width: 100%;
+    max-width: 420px;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+label {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: block;
+}
+
+input[type="date"] {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    margin-bottom: 15px;
+    transition: 0.3s;
+}
+
+input:focus {
+    border-color: #667eea;
+    outline: none;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background: var(--accent);
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: var(--accent-hover);
+    transform: translateY(-2px);
+}
+
+.result {
+    margin-top: 20px;
+    padding: 12px;
+    border-radius: 6px;
+    display: none;
+    font-size: 14px;
+}
+
+.success {
+    background: var(--success-bg);
+    color: var(--success-text);
+}
+
+.error {
+    background: var(--error-bg);
+    color: var(--error-text);
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>Age Calculator</h1>
+
+    <form id="ageForm">
+        <label for="dob">Date of Birth</label>
+        <input type="date" id="dob" required>
+        <button type="submit">Calculate Age</button>
+    </form>
+
+    <div id="result" class="result"></div>
+</div>
+
+<script>
+const form = document.getElementById("ageForm");
+const dobInput = document.getElementById("dob");
+const resultDiv = document.getElementById("result");
+
+dobInput.max = new Date().toISOString().split("T")[0];
+
+form.addEventListener("submit", function(e) {
+    e.preventDefault();
+    calculateAge();
+});
+
+function calculateAge() {
+
+    resultDiv.className = "result";
+    resultDiv.style.display = "block";
+
+    if (!dobInput.value) {
+        showError("Please select your date of birth.");
+        return;
+    }
+
+    const dob = new Date(dobInput.value);
+    const today = new Date();
+
+    if (dob > today) {
+        showError("Date of birth cannot be in the future.");
+        return;
+    }
+
+    let years = today.getFullYear() - dob.getFullYear();
+    let months = today.getMonth() - dob.getMonth();
+    let days = today.getDate() - dob.getDate();
+
+    if (days < 0) {
+        months--;
+        days += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+    }
+
+    if (months < 0) {
+        years--;
+        months += 12;
+    }
+
+    const totalDays = Math.floor((today - dob) / (1000 * 60 * 60 * 24));
+
+    resultDiv.classList.add("success");
+    resultDiv.innerHTML = `
+        <strong>Age:</strong> ${years} Years, ${months} Months, ${days} Days <br>
+        <strong>Total Days Lived:</strong> ${totalDays.toLocaleString()} days
+    `;
+}
+
+function showError(message) {
+    resultDiv.classList.add("error");
+    resultDiv.textContent = message;
+}
+</script>
+
+</body>
+</html>
